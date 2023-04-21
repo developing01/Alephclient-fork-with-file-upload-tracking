@@ -40,6 +40,8 @@ class CrawlDirectory(object):
         self.collection = collection
         self.collection_id = cast(str, collection.get("id"))
         self.root = path
+        self.sqlite_db_name = 'aleph_client.db'
+        self.sqlite_connection = SqliteConnection(path=self.root)
         self.queue: Queue = Queue()
         self.scan_queue: Queue = Queue()
         if path.is_dir():
@@ -88,6 +90,8 @@ class CrawlDirectory(object):
                     break
                 if self.is_excluded(child):
                     continue
+                if str(child) == self.sqlite_db_name:
+                    continue
                 if child.is_dir():
                     # Use a separate scan queue to avoid calling scandir recursively.
                     self.scan_queue.put((child, id))
@@ -125,8 +129,7 @@ class CrawlDirectory(object):
                 return None
 
     def ingest_upload(self, path: Path, parent_id: str, foreign_id: str):
-        sqlite_connection = SqliteConnection()
-        if sqlite_connection.check_file_exist(str(path)):
+        if self.sqlite_connection.check_file_exist(str(path)):
             return None
 
         metadata = {
@@ -144,7 +147,7 @@ class CrawlDirectory(object):
         )
         if "id" not in result and not hasattr(result, "id"):
             raise AlephException("Upload failed")
-        sqlite_connection.add_uploaded_file(str(path))
+        self.sqlite_connection.add_uploaded_file(str(path))
         return result["id"]
 
 
