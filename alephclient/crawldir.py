@@ -83,7 +83,7 @@ class CrawlDirectory(object):
         return self.exclude["f"].fullmatch(path.name) is not None
 
     def check_db_file(self, child):
-        if len(str(child)) > 15:
+        if len(str(child)) >= 15:
             return str(child)[-15:] == self.sqlite_db_name
         return False
 
