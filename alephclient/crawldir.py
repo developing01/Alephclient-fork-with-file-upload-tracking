@@ -13,7 +13,7 @@ from alephclient.api import AlephAPI
 from alephclient.errors import AlephException
 from alephclient.util import backoff
 
-from alephclient.alephclient.sqlite_services import SqliteConnection
+from alephclient.sqlite_services import SqliteConnection
 
 log = logging.getLogger(__name__)
 
