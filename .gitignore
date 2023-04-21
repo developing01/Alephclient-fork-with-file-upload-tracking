@@ -5,6 +5,7 @@
 tsconfig.json
 jsconfig.json
 .DS_Store
+.idea
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

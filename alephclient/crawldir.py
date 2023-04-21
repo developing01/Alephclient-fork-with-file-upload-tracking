@@ -13,6 +13,8 @@ from alephclient.api import AlephAPI
 from alephclient.errors import AlephException
 from alephclient.util import backoff
 
+from alephclient.alephclient.sqlite_services import SqliteConnection
+
 log = logging.getLogger(__name__)
 
 
@@ -122,7 +124,11 @@ class CrawlDirectory(object):
                 log.exception("Failed [%s]: %s", self.collection_id, path)
                 return None
 
-    def ingest_upload(self, path: Path, parent_id: str, foreign_id: str) -> str:
+    def ingest_upload(self, path: Path, parent_id: str, foreign_id: str):
+        sqlite_connection = SqliteConnection()
+        if sqlite_connection.check_file_exist(str(path)):
+            return None
+
         metadata = {
             "foreign_id": foreign_id,
             "file_name": path.name,
@@ -138,6 +144,7 @@ class CrawlDirectory(object):
         )
         if "id" not in result and not hasattr(result, "id"):
             raise AlephException("Upload failed")
+        sqlite_connection.add_uploaded_file(str(path))
         return result["id"]
 
 
