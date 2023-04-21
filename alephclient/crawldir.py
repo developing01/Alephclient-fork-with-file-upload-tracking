@@ -82,11 +82,6 @@ class CrawlDirectory(object):
             return self.exclude["d"].fullmatch(path.name) is not None
         return self.exclude["f"].fullmatch(path.name) is not None
 
-    def check_db_file(self, child):
-        if len(str(child)) >= 15:
-            return str(child)[-15:] == self.sqlite_db_name
-        return False
-
     def scandir(self, path: Path, id: str, parent_id: str):
         with os.scandir(path) as iterator:
             while True:
@@ -94,8 +89,6 @@ class CrawlDirectory(object):
                 if child is None:
                     break
                 if self.is_excluded(child):
-                    continue
-                if self.check_db_file(child):
                     continue
                 if child.is_dir():
                     # Use a separate scan queue to avoid calling scandir recursively.
@@ -135,6 +128,9 @@ class CrawlDirectory(object):
 
     def ingest_upload(self, path: Path, parent_id: str, foreign_id: str):
         if self.sqlite_connection.check_file_exist(str(path)):
+            return None
+
+        if path.name == self.sqlite_db_name:
             return None
 
         metadata = {
