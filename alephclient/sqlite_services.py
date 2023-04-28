@@ -27,4 +27,5 @@ class SqliteConnection:
         exists_file = session.query(UploadedFile).filter(
             UploadedFile.file_identification==file_identification
         ).all()
+        session.close()
         return True if exists_file else False

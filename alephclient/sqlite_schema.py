@@ -8,4 +8,4 @@ class UploadedFile(Base):
     __tablename__ = 'uploaded_file'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    file_identification = Column(String)
+    file_identification = Column(String, index=True)
